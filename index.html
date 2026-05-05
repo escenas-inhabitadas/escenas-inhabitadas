@@ -2,9 +2,14 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Video Interactivo</title>
 
 <style>
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     margin: 0;
     overflow: hidden;
@@ -28,18 +33,23 @@
     align-items: center;
     flex-direction: column;
     pointer-events: none;
+    z-index: 2;
   }
 
   .buttons {
     display: none;
-    gap: 20px;
+    gap: clamp(8px, 2vw, 20px);
     pointer-events: all;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 clamp(10px, 4vw, 40px);
+    max-width: 100%;
   }
 
   /* BOTONES OPCIONES */
   .buttons button {
-    padding: 16px 32px;
-    font-size: 18px;
+    padding: clamp(10px, 1.8vh, 16px) clamp(16px, 3vw, 32px);
+    font-size: clamp(13px, 2.2vw, 18px);
     border-radius: 14px;
     border: 2px solid white;
     cursor: pointer;
@@ -48,6 +58,7 @@
     box-shadow: 0 6px 25px rgba(0,0,0,0.6);
     text-shadow: 0 2px 5px rgba(0,0,0,0.8);
     transition: 0.25s;
+    min-width: clamp(70px, 12vw, 120px);
   }
 
   .buttons button:hover {
@@ -59,10 +70,10 @@
   /* BOTÓN TIKTOK */
   #finalButton {
     display: none;
-    margin-top: 20px;
+    margin-top: clamp(12px, 2vh, 20px);
     pointer-events: all;
-    padding: 16px 32px;
-    font-size: 18px;
+    padding: clamp(10px, 1.8vh, 16px) clamp(16px, 3vw, 32px);
+    font-size: clamp(13px, 2.2vw, 18px);
     border-radius: 14px;
     border: 2px solid white;
     cursor: pointer;
@@ -84,10 +95,10 @@
   /* BOTÓN REINICIAR FLUJO */
   #restartFlowButton {
     display: none;
-    margin-top: 10px;
+    margin-top: clamp(6px, 1vh, 10px);
     pointer-events: all;
-    padding: 16px 32px;
-    font-size: 18px;
+    padding: clamp(10px, 1.8vh, 16px) clamp(16px, 3vw, 32px);
+    font-size: clamp(13px, 2.2vw, 18px);
     border-radius: 14px;
     border: 2px solid white;
     cursor: pointer;
@@ -104,14 +115,20 @@
     transform: scale(1.08);
   }
 
+  /* BOTÓN GENÉRICO (controles) */
   button {
-    padding: 12px 25px;
-    font-size: 16px;
+    padding: clamp(8px, 1.5vh, 12px) clamp(12px, 2.2vw, 25px);
+    font-size: clamp(13px, 2vw, 16px);
     border-radius: 10px;
     border: none;
     cursor: pointer;
     background: rgba(255,255,255,0.2);
     color: white;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    background: rgba(255,255,255,0.4);
   }
 
   #startScreen {
@@ -125,18 +142,89 @@
     z-index: 5;
   }
 
+  #startScreen button {
+    padding: clamp(12px, 2vh, 18px) clamp(28px, 5vw, 52px);
+    font-size: clamp(16px, 3vw, 22px);
+    border-radius: 12px;
+    border: 2px solid white;
+    background: rgba(255,255,255,0.2);
+    color: white;
+  }
+
   #controls {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
+    bottom: clamp(10px, 2vh, 20px);
+    left: clamp(10px, 2vw, 20px);
     z-index: 3;
     display: flex;
-    gap: 10px;
+    gap: clamp(6px, 1vw, 10px);
+  }
+
+  /* CONTROL DE VOLUMEN */
+  #volumeControl {
+    position: fixed;
+    bottom: clamp(10px, 2vh, 20px);
+    right: clamp(10px, 2vw, 20px);
+    z-index: 3;
+    display: none;
+    align-items: center;
+    gap: clamp(4px, 1vw, 8px);
+  }
+
+  #volumeSlider {
+    width: clamp(60px, 10vw, 120px);
+    cursor: pointer;
+    accent-color: white;
+  }
+
+  /* OVERLAY GIRAR PANTALLA */
+  #rotateOverlay {
+    display: none;
+    position: fixed;
+    z-index: 200;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  #rotateOverlay .rotate-icon {
+    font-size: clamp(48px, 12vw, 80px);
+    animation: rotateAnim 2s ease-in-out infinite;
+  }
+
+  #rotateOverlay p {
+    font-size: clamp(16px, 5vw, 24px);
+    margin: 0;
+    max-width: 320px;
+    line-height: 1.4;
+  }
+
+  @keyframes rotateAnim {
+    0%, 100% { transform: rotate(0deg); }
+    50%       { transform: rotate(90deg); }
+  }
+
+  /* Forzar giro en móviles en modo retrato */
+  @media (hover: none) and (orientation: portrait) {
+    #rotateOverlay { display: flex; }
   }
 </style>
 </head>
 
 <body>
+
+<!-- OVERLAY: GIRAR DISPOSITIVO -->
+<div id="rotateOverlay">
+  <div class="rotate-icon">📱</div>
+  <p>Por favor, gira tu dispositivo para una mejor experiencia</p>
+</div>
 
 <video id="video" muted playsinline></video>
 
@@ -169,25 +257,57 @@
 <div id="controls">
   <button onclick="restartVideo()">⏮</button>
   <button onclick="togglePlay()">⏯</button>
-  <button onclick="skip()">⏭</button>
+  <button id="skipBtn" onclick="skip()">⏭</button>
+</div>
+
+<!-- VOLUMEN -->
+<div id="volumeControl">
+  <button id="muteBtn" onclick="toggleMute()">🔊</button>
+  <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)">
 </div>
 
 <script>
-  const video = document.getElementById("video");
-  const options = document.getElementById("options");
-  const finalButton = document.getElementById("finalButton");
-  const restartFlowButton = document.getElementById("restartFlowButton");
-  const startScreen = document.getElementById("startScreen");
+  const video            = document.getElementById("video");
+  const options          = document.getElementById("options");
+  const finalButton      = document.getElementById("finalButton");
+  const restartFlowButton= document.getElementById("restartFlowButton");
+  const startScreen      = document.getElementById("startScreen");
+  const skipBtn          = document.getElementById("skipBtn");
+  const volumeControl    = document.getElementById("volumeControl");
+  const muteBtn          = document.getElementById("muteBtn");
+  const volumeSlider     = document.getElementById("volumeSlider");
+  const rotateOverlay    = document.getElementById("rotateOverlay");
 
-  let isIntro = true;
+  // isIntro: true si el video actual es la intro (no una ruta)
+  // introCompleted: true si la intro ya terminó o fue saltada
+  // skipping: flag para evitar que el evento "ended" se dispare al hacer seek manual
+  let isIntro        = true;
+  let introCompleted = false;
+  let skipping       = false;
 
+  // --- Orientación ---
+  function checkOrientation() {
+    const portrait = window.innerHeight > window.innerWidth;
+    const touch    = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    rotateOverlay.style.display = (portrait && touch) ? "flex" : "none";
+  }
+  window.addEventListener("resize", checkOrientation);
+  window.addEventListener("orientationchange", checkOrientation);
+  checkOrientation();
+
+  // --- Inicio ---
   function start() {
     startScreen.style.display = "none";
+    // Intentar activar audio tras interacción del usuario
+    video.muted  = false;
+    video.volume = 1;
+    volumeControl.style.display = "flex";
     loadVideo("Rough_Intro(Todo).mp4", true);
   }
 
   function loadVideo(src, intro = false) {
-    isIntro = intro;
+    isIntro        = intro;
+    introCompleted = false;
 
     video.pause();
     video.src = src;
@@ -199,26 +319,34 @@
     }, 100);
   }
 
+  // --- Fin natural del video ---
   video.addEventListener("ended", () => {
+    if (skipping) return; // ignorar si fue un seek manual
+
     if (isIntro) {
+      introCompleted = true;
+      skipBtn.style.display = "none";
       options.style.display = "flex";
     } else {
-      finalButton.style.display = "flex";
+      skipBtn.style.display = "none";
+      finalButton.style.display     = "flex";
       restartFlowButton.style.display = "block";
     }
   });
 
+  // --- Selección de ruta ---
   function playVideo(src) {
-    options.style.display = "none";
-    finalButton.style.display = "none";
+    options.style.display           = "none";
+    finalButton.style.display       = "none";
     restartFlowButton.style.display = "none";
+    skipBtn.style.display           = "block";
 
     loadVideo(src, false);
   }
 
+  // --- Controles de reproducción ---
   function togglePlay() {
     if (!video.src) return;
-
     if (video.paused) video.play().catch(() => {});
     else video.pause();
   }
@@ -226,33 +354,83 @@
   function restartVideo() {
     if (!video.src) return;
 
+    // Ocultar todos los overlays de botones
+    options.style.display           = "none";
+    finalButton.style.display       = "none";
+    restartFlowButton.style.display = "none";
+    skipBtn.style.display           = "block";
+
+    // Restaurar estado de intro si corresponde
+    if (isIntro) introCompleted = false;
+
     video.currentTime = 0;
     video.play().catch(() => {});
   }
 
+  // --- Adelantar (skip) ---
   function skip() {
-    video.pause();
+    if (isIntro && !introCompleted) {
+      // Primera vez que se adelanta la intro
+      skipping       = true;
+      introCompleted = true;
+      video.pause();
 
-    if (isIntro) {
-      options.style.display = "flex";
-      isIntro = false;
-    } else {
-      finalButton.style.display = "flex";
+      // Mostrar frame final de la intro
+      if (video.duration && isFinite(video.duration)) {
+        video.currentTime = video.duration;
+      }
+
+      // Ocultar skip hasta que se elija una opción
+      skipBtn.style.display  = "none";
+      options.style.display  = "flex";
+      setTimeout(() => { skipping = false; }, 300);
+
+    } else if (!isIntro) {
+      // Saltar un video de ruta
+      skipping = true;
+      video.pause();
+
+      if (video.duration && isFinite(video.duration)) {
+        video.currentTime = video.duration;
+      }
+
+      skipBtn.style.display           = "none";
+      finalButton.style.display       = "flex";
       restartFlowButton.style.display = "block";
+      setTimeout(() => { skipping = false; }, 300);
     }
+    // Si introCompleted=true e isIntro=true, skip no hace nada
+    // (los botones de opción ya están visibles)
   }
 
+  // --- Reiniciar flujo completo ---
   function restartFlow() {
-    options.style.display = "none";
-    finalButton.style.display = "none";
+    options.style.display           = "none";
+    finalButton.style.display       = "none";
     restartFlowButton.style.display = "none";
+    skipBtn.style.display           = "block";
 
-    isIntro = true;
+    isIntro        = true;
+    introCompleted = false;
     loadVideo("Rough_Intro(Todo).mp4", true);
   }
 
   function goToLink() {
     window.open("https://www.tiktok.com/@escenas_inhabitadas?_r=1&_t=ZS-95hnxZTzgVZ", "_blank");
+  }
+
+  // --- Volumen ---
+  function toggleMute() {
+    video.muted = !video.muted;
+    muteBtn.textContent = video.muted ? "🔇" : "🔊";
+    if (!video.muted) volumeSlider.value = video.volume;
+  }
+
+  function setVolume(val) {
+    const v = parseFloat(val);
+    video.volume = v;
+    video.muted  = v === 0;
+    muteBtn.textContent = v === 0 ? "🔇" : "🔊";
   }
 </script>
 
