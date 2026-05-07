@@ -15,11 +15,30 @@
   box-sizing:border-box;
 }
 
+html,
 body{
   margin:0;
+  width:100%;
+  height:100%;
   overflow:hidden;
   background:black;
   font-family:Arial,sans-serif;
+}
+
+/* =========================
+   APP
+========================= */
+
+.app{
+  position:fixed;
+  inset:0;
+
+  width:100%;
+  height:100%;
+
+  overflow:hidden;
+
+  background:black;
 }
 
 /* =========================
@@ -35,6 +54,42 @@ video{
   height:100dvh;
 
   object-fit:contain;
+
+  background:black;
+}
+
+/* =========================
+   MOBILE PORTRAIT
+   ROTAR TODA LA INTERFAZ
+========================= */
+
+@media (hover:none) and (orientation:portrait){
+
+  body{
+    overflow:hidden;
+  }
+
+  .app{
+
+    width:100vh;
+    height:100vw;
+
+    top:50%;
+    left:50%;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(90deg);
+
+    transform-origin:center center;
+  }
+
+  video{
+    width:100%;
+    height:100%;
+
+    object-fit:contain;
+  }
 }
 
 /* =========================
@@ -375,60 +430,6 @@ button:active{
 }
 
 /* =========================
-   OVERLAY ROTAR
-========================= */
-
-#rotateOverlay{
-  display:none;
-
-  position:fixed;
-  inset:0;
-
-  z-index:200;
-
-  background:black;
-  color:white;
-
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-
-  text-align:center;
-
-  padding:20px;
-  gap:20px;
-
-  opacity:1;
-}
-
-#rotateOverlay .rotate-icon{
-  font-size:clamp(48px,12vw,80px);
-
-  animation:
-    rotateAnim 2s ease-in-out infinite;
-}
-
-#rotateOverlay p{
-  margin:0;
-
-  max-width:320px;
-
-  font-size:clamp(16px,5vw,24px);
-  line-height:1.4;
-}
-
-@keyframes rotateAnim{
-
-  0%,100%{
-    transform:rotate(0deg);
-  }
-
-  50%{
-    transform:rotate(90deg);
-  }
-}
-
-/* =========================
    MOBILE
 ========================= */
 
@@ -466,124 +467,114 @@ button:active{
 
 <body>
 
-<!-- ROTATE -->
-<div id="rotateOverlay">
+<div class="app">
 
-  <div class="rotate-icon">
-    📱
-  </div>
+  <!-- VIDEO -->
+  <video
+    id="video"
+    muted
+    playsinline
+  ></video>
 
-  <p>
-    Por favor, gira tu dispositivo
-    para una mejor experiencia
-  </p>
+  <!-- START -->
+  <div id="startScreen">
 
-</div>
-
-<!-- VIDEO -->
-<video
-  id="video"
-  muted
-  playsinline
-></video>
-
-<!-- START -->
-<div id="startScreen">
-
-  <button onclick="start()">
-    Iniciar
-  </button>
-
-</div>
-
-<!-- OVERLAY -->
-<div class="overlay">
-
-  <!-- OPCIONES -->
-  <div class="buttons" id="options">
-
-    <button onclick="playVideo('Rough_Agite.mp4')">
-      Agité
-    </button>
-
-    <button onclick="playVideo('Rough_OFicinaCentral.mp4')">
-      Oficina
-    </button>
-
-    <button onclick="playVideo('Rough_PequenoTeatro.mp4')">
-      Teatro
+    <button onclick="start()">
+      Iniciar
     </button>
 
   </div>
 
-  <!-- TIKTOK -->
-  <button
-    id="finalButton"
-    onclick="goToLink()"
-    aria-label="TikTok"
-  >
+  <!-- OVERLAY -->
+  <div class="overlay">
 
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
+    <!-- OPCIONES -->
+    <div class="buttons" id="options">
+
+      <button onclick="playVideo('Rough_Agite.mp4')">
+        Agité
+      </button>
+
+      <button onclick="playVideo('Rough_OFicinaCentral.mp4')">
+        Oficina
+      </button>
+
+      <button onclick="playVideo('Rough_PequenoTeatro.mp4')">
+        Teatro
+      </button>
+
+    </div>
+
+    <!-- TIKTOK -->
+    <button
+      id="finalButton"
+      onclick="goToLink()"
+      aria-label="TikTok"
     >
-      <path d="M12.75 2h2.25c.2 1.9 1.7 3.4 3.6 3.6v2.3c-1.3-.1-2.5-.5-3.6-1.2v7.4c0 3.2-2.6 5.8-5.8 5.8s-5.8-2.6-5.8-5.8 2.6-5.8 5.8-5.8c.3 0 .6 0 .9.1v2.4c-.3-.1-.6-.2-.9-.2-1.9 0-3.4 1.5-3.4 3.4s1.5 3.4 3.4 3.4 3.4-1.5 3.4-3.4V2z"/>
-    </svg>
 
-  </button>
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path d="M12.75 2h2.25c.2 1.9 1.7 3.4 3.6 3.6v2.3c-1.3-.1-2.5-.5-3.6-1.2v7.4c0 3.2-2.6 5.8-5.8 5.8s-5.8-2.6-5.8-5.8 2.6-5.8 5.8-5.8c.3 0 .6 0 .9.1v2.4c-.3-.1-.6-.2-.9-.2-1.9 0-3.4 1.5-3.4 3.4s1.5 3.4 3.4 3.4 3.4-1.5 3.4-3.4V2z"/>
+      </svg>
 
-  <!-- RESTART -->
-  <button
-    id="restartFlowButton"
-    onclick="restartFlow()"
-    aria-label="Reiniciar"
-  >
-    ↻
-  </button>
+    </button>
 
-</div>
-
-<!-- CONTROLES -->
-<div id="controls">
-
-  <button onclick="restartVideo()">
-    ⏮
-  </button>
-
-  <button onclick="togglePlay()">
-    ⏯
-  </button>
-
-  <button
-    id="skipBtn"
-    onclick="skip()"
-  >
-    ⏭
-  </button>
-
-</div>
-
-<!-- VOLUMEN -->
-<div id="volumeControl">
-
-  <div id="volumeWrapper">
-
-    <input
-      type="range"
-      id="volumeSlider"
-      min="0"
-      max="1"
-      step="0.05"
-      value="1"
-      oninput="setVolume(this.value)"
+    <!-- RESTART -->
+    <button
+      id="restartFlowButton"
+      onclick="restartFlow()"
+      aria-label="Reiniciar"
     >
+      ↻
+    </button>
+
+  </div>
+
+  <!-- CONTROLES -->
+  <div id="controls">
+
+    <button onclick="restartVideo()">
+      ⏮
+    </button>
+
+    <button onclick="togglePlay()">
+      ⏯
+    </button>
 
     <button
-      id="muteBtn"
-      onclick="toggleMute()"
+      id="skipBtn"
+      onclick="skip()"
     >
-      🔊
+      ⏭
     </button>
+
+  </div>
+
+  <!-- VOLUMEN -->
+  <div id="volumeControl">
+
+    <div id="volumeWrapper">
+
+      <input
+        type="range"
+        id="volumeSlider"
+        min="0"
+        max="1"
+        step="0.05"
+        value="1"
+        oninput="setVolume(this.value)"
+      >
+
+      <button
+        id="muteBtn"
+        onclick="toggleMute()"
+      >
+        🔊
+      </button>
+
+    </div>
 
   </div>
 
@@ -618,73 +609,9 @@ const muteBtn =
 const volumeSlider =
   document.getElementById("volumeSlider");
 
-const rotateOverlay =
-  document.getElementById("rotateOverlay");
-
 let isIntro = true;
 let introCompleted = false;
 let skipping = false;
-
-/* =========================
-   ORIENTATION
-========================= */
-
-let rotateTimeout = null;
-
-function checkOrientation(){
-
-  const portrait =
-    window.innerHeight >
-    window.innerWidth;
-
-  const touch =
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0;
-
-  if(portrait && touch){
-
-    rotateOverlay.style.display = "flex";
-    rotateOverlay.style.opacity = "1";
-
-    clearTimeout(rotateTimeout);
-
-    rotateTimeout = setTimeout(() => {
-
-      rotateOverlay.style.transition =
-        "opacity 0.8s ease";
-
-      rotateOverlay.style.opacity = "0";
-
-      setTimeout(() => {
-
-        rotateOverlay.style.display =
-          "none";
-
-      },800);
-
-    },3000);
-
-  }else{
-
-    clearTimeout(rotateTimeout);
-
-    rotateOverlay.style.opacity = "1";
-
-    rotateOverlay.style.display = "none";
-  }
-}
-
-window.addEventListener(
-  "resize",
-  checkOrientation
-);
-
-window.addEventListener(
-  "orientationchange",
-  checkOrientation
-);
-
-checkOrientation();
 
 /* =========================
    START
