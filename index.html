@@ -23,7 +23,7 @@
     left: 0;
     width: 100%;
     height: 100vh;
-    height: 100dvh; /* viewport real en móviles (excluye barra del navegador) */
+    height: 100dvh;
     object-fit: contain;
   }
 
@@ -49,7 +49,6 @@
     max-width: 100%;
   }
 
-  /* BOTONES OPCIONES */
   .buttons button {
     padding: clamp(10px, 1.8vh, 16px) clamp(16px, 3vw, 32px);
     font-size: clamp(13px, 2.2vw, 18px);
@@ -70,7 +69,6 @@
     transform: scale(1.08);
   }
 
-  /* BOTÓN TIKTOK */
   #finalButton {
     display: none;
     margin-top: clamp(12px, 2vh, 20px);
@@ -95,7 +93,6 @@
     transform: scale(1.08);
   }
 
-  /* BOTÓN REINICIAR FLUJO */
   #restartFlowButton {
     display: none;
     margin-top: clamp(6px, 1vh, 10px);
@@ -118,7 +115,6 @@
     transform: scale(1.08);
   }
 
-  /* BOTÓN GENÉRICO (controles) */
   button {
     padding: clamp(8px, 1.5vh, 12px) clamp(12px, 2.2vw, 25px);
     font-size: clamp(13px, 2vw, 16px);
@@ -167,20 +163,68 @@
   #volumeControl {
     position: fixed;
     bottom: clamp(10px, 2vh, 20px);
-    right: clamp(10px, 2vw, 20px);
-    z-index: 3;
+    right: max(env(safe-area-inset-right), 10px);
+    z-index: 50;
     display: none;
+  }
+
+  #volumeWrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
     align-items: center;
-    gap: clamp(4px, 1vw, 8px);
+  }
+
+  #muteBtn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 18px;
+    background: rgba(0,0,0,0.75);
+    border: 2px solid rgba(255,255,255,0.9);
+    backdrop-filter: blur(6px);
+    color: white;
+    cursor: pointer;
   }
 
   #volumeSlider {
-    width: clamp(60px, 10vw, 120px);
-    cursor: pointer;
+    position: absolute;
+    bottom: 72px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-90deg);
+
+    width: 120px;
+    height: 6px;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
     accent-color: white;
   }
 
-  /* OVERLAY GIRAR PANTALLA */
+  #volumeWrapper:hover #volumeSlider,
+  #volumeWrapper:focus-within #volumeSlider {
+    opacity: 1;
+    pointer-events: auto;
+
+    transform:
+      translateX(-50%)
+      rotate(-90deg)
+      scale(1);
+  }
+
+  @media (hover: none) {
+    #volumeSlider {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
   #rotateOverlay {
     display: none;
     position: fixed;
@@ -211,19 +255,19 @@
 
   @keyframes rotateAnim {
     0%, 100% { transform: rotate(0deg); }
-    50%       { transform: rotate(90deg); }
+    50% { transform: rotate(90deg); }
   }
 
-  /* Forzar giro en móviles en modo retrato */
   @media (hover: none) and (orientation: portrait) {
-    #rotateOverlay { display: flex; }
+    #rotateOverlay {
+      display: flex;
+    }
   }
 </style>
 </head>
 
 <body>
 
-<!-- OVERLAY: GIRAR DISPOSITIVO -->
 <div id="rotateOverlay">
   <div class="rotate-icon">📱</div>
   <p>Por favor, gira tu dispositivo para una mejor experiencia</p>
@@ -231,12 +275,10 @@
 
 <video id="video" muted playsinline></video>
 
-<!-- INICIO -->
 <div id="startScreen">
   <button onclick="start()">Iniciar</button>
 </div>
 
-<!-- OPCIONES -->
 <div class="overlay">
   <div class="buttons" id="options">
     <button onclick="playVideo('Rough_Agite.mp4')">Agité</button>
@@ -244,7 +286,6 @@
     <button onclick="playVideo('Rough_PequenoTeatro.mp4')">Teatro</button>
   </div>
 
-  <!-- TikTok -->
   <button id="finalButton" onclick="goToLink()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
       <path d="M12.75 2h2.25c.2 1.9 1.7 3.4 3.6 3.6v2.3c-1.3-.1-2.5-.5-3.6-1.2v7.4c0 3.2-2.6 5.8-5.8 5.8s-5.8-2.6-5.8-5.8 2.6-5.8 5.8-5.8c.3 0 .6 0 .9.1v2.4c-.3-.1-.6-.2-.9-.2-1.9 0-3.4 1.5-3.4 3.4s1.5 3.4 3.4 3.4 3.4-1.5 3.4-3.4V2z"/>
@@ -252,64 +293,76 @@
     Tik Tok
   </button>
 
-  <!-- Reiniciar flujo -->
   <button id="restartFlowButton" onclick="restartFlow()">Reiniciar</button>
 </div>
 
-<!-- CONTROLES -->
 <div id="controls">
   <button onclick="restartVideo()">⏮</button>
   <button onclick="togglePlay()">⏯</button>
   <button id="skipBtn" onclick="skip()">⏭</button>
 </div>
 
-<!-- VOLUMEN -->
+<!-- NUEVO CONTROL VOLUMEN -->
 <div id="volumeControl">
-  <button id="muteBtn" onclick="toggleMute()">🔊</button>
-  <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)">
+  <div id="volumeWrapper">
+
+    <input
+      type="range"
+      id="volumeSlider"
+      min="0"
+      max="1"
+      step="0.05"
+      value="1"
+      oninput="setVolume(this.value)"
+    >
+
+    <button id="muteBtn" onclick="toggleMute()">🔊</button>
+
+  </div>
 </div>
 
 <script>
-  const video            = document.getElementById("video");
-  const options          = document.getElementById("options");
-  const finalButton      = document.getElementById("finalButton");
-  const restartFlowButton= document.getElementById("restartFlowButton");
-  const startScreen      = document.getElementById("startScreen");
-  const skipBtn          = document.getElementById("skipBtn");
-  const volumeControl    = document.getElementById("volumeControl");
-  const muteBtn          = document.getElementById("muteBtn");
-  const volumeSlider     = document.getElementById("volumeSlider");
-  const rotateOverlay    = document.getElementById("rotateOverlay");
+  const video             = document.getElementById("video");
+  const options           = document.getElementById("options");
+  const finalButton       = document.getElementById("finalButton");
+  const restartFlowButton = document.getElementById("restartFlowButton");
+  const startScreen       = document.getElementById("startScreen");
+  const skipBtn           = document.getElementById("skipBtn");
+  const volumeControl     = document.getElementById("volumeControl");
+  const muteBtn           = document.getElementById("muteBtn");
+  const volumeSlider      = document.getElementById("volumeSlider");
+  const rotateOverlay     = document.getElementById("rotateOverlay");
 
-  // isIntro: true si el video actual es la intro (no una ruta)
-  // introCompleted: true si la intro ya terminó o fue saltada
-  // skipping: flag para evitar que el evento "ended" se dispare al hacer seek manual
-  let isIntro        = true;
+  let isIntro = true;
   let introCompleted = false;
-  let skipping       = false;
+  let skipping = false;
 
-  // --- Orientación ---
   function checkOrientation() {
     const portrait = window.innerHeight > window.innerWidth;
-    const touch    = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    rotateOverlay.style.display = (portrait && touch) ? "flex" : "none";
+    const touch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+    rotateOverlay.style.display =
+      (portrait && touch) ? "flex" : "none";
   }
+
   window.addEventListener("resize", checkOrientation);
   window.addEventListener("orientationchange", checkOrientation);
+
   checkOrientation();
 
-  // --- Inicio ---
   function start() {
     startScreen.style.display = "none";
-    // Intentar activar audio tras interacción del usuario
-    video.muted  = false;
+
+    video.muted = false;
     video.volume = 1;
-    volumeControl.style.display = "flex";
+
+    volumeControl.style.display = "block";
+
     loadVideo("Color_Intro_TODO.mp4", true);
   }
 
   function loadVideo(src, intro = false) {
-    isIntro        = intro;
+    isIntro = intro;
     introCompleted = false;
 
     video.pause();
@@ -322,9 +375,8 @@
     }, 100);
   }
 
-  // --- Fin natural del video ---
   video.addEventListener("ended", () => {
-    if (skipping) return; // ignorar si fue un seek manual
+    if (skipping) return;
 
     if (isIntro) {
       introCompleted = true;
@@ -332,108 +384,127 @@
       options.style.display = "flex";
     } else {
       skipBtn.style.display = "none";
-      finalButton.style.display     = "flex";
+      finalButton.style.display = "flex";
       restartFlowButton.style.display = "block";
     }
   });
 
-  // --- Selección de ruta ---
   function playVideo(src) {
-    options.style.display           = "none";
-    finalButton.style.display       = "none";
+    options.style.display = "none";
+    finalButton.style.display = "none";
     restartFlowButton.style.display = "none";
-    skipBtn.style.display           = "block";
+
+    skipBtn.style.display = "block";
 
     loadVideo(src, false);
   }
 
-  // --- Controles de reproducción ---
   function togglePlay() {
     if (!video.src) return;
-    if (video.paused) video.play().catch(() => {});
-    else video.pause();
+
+    if (video.paused) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
   }
 
   function restartVideo() {
     if (!video.src) return;
 
-    // Ocultar todos los overlays de botones
-    options.style.display           = "none";
-    finalButton.style.display       = "none";
+    options.style.display = "none";
+    finalButton.style.display = "none";
     restartFlowButton.style.display = "none";
-    skipBtn.style.display           = "block";
 
-    // Restaurar estado de intro si corresponde
-    if (isIntro) introCompleted = false;
+    skipBtn.style.display = "block";
+
+    if (isIntro) {
+      introCompleted = false;
+    }
 
     video.currentTime = 0;
+
     video.play().catch(() => {});
   }
 
-  // --- Adelantar (skip) ---
   function skip() {
     if (isIntro && !introCompleted) {
-      // Primera vez que se adelanta la intro
-      skipping       = true;
+
+      skipping = true;
       introCompleted = true;
+
       video.pause();
 
-      // Mostrar frame final de la intro
       if (video.duration && isFinite(video.duration)) {
         video.currentTime = video.duration;
       }
 
-      // Ocultar skip hasta que se elija una opción
-      skipBtn.style.display  = "none";
-      options.style.display  = "flex";
-      setTimeout(() => { skipping = false; }, 300);
+      skipBtn.style.display = "none";
+      options.style.display = "flex";
+
+      setTimeout(() => {
+        skipping = false;
+      }, 300);
 
     } else if (!isIntro) {
-      // Saltar un video de ruta
+
       skipping = true;
+
       video.pause();
 
       if (video.duration && isFinite(video.duration)) {
         video.currentTime = video.duration;
       }
 
-      skipBtn.style.display           = "none";
-      finalButton.style.display       = "flex";
+      skipBtn.style.display = "none";
+      finalButton.style.display = "flex";
       restartFlowButton.style.display = "block";
-      setTimeout(() => { skipping = false; }, 300);
+
+      setTimeout(() => {
+        skipping = false;
+      }, 300);
     }
-    // Si introCompleted=true e isIntro=true, skip no hace nada
-    // (los botones de opción ya están visibles)
   }
 
-  // --- Reiniciar flujo completo ---
   function restartFlow() {
-    options.style.display           = "none";
-    finalButton.style.display       = "none";
+    options.style.display = "none";
+    finalButton.style.display = "none";
     restartFlowButton.style.display = "none";
-    skipBtn.style.display           = "block";
 
-    isIntro        = true;
+    skipBtn.style.display = "block";
+
+    isIntro = true;
     introCompleted = false;
+
     loadVideo("Color_Intro_TODO.mp4", true);
   }
 
   function goToLink() {
-    window.open("https://www.tiktok.com/@escenas_inhabitadas?_r=1&_t=ZS-95hnxZTzgVZ", "_blank");
+    window.open(
+      "https://www.tiktok.com/@escenas_inhabitadas?_r=1&_t=ZS-95hnxZTzgVZ",
+      "_blank"
+    );
   }
 
-  // --- Volumen ---
   function toggleMute() {
     video.muted = !video.muted;
-    muteBtn.textContent = video.muted ? "🔇" : "🔊";
-    if (!video.muted) volumeSlider.value = video.volume;
+
+    muteBtn.textContent =
+      video.muted ? "🔇" : "🔊";
+
+    if (!video.muted) {
+      volumeSlider.value = video.volume;
+    }
   }
 
   function setVolume(val) {
     const v = parseFloat(val);
+
     video.volume = v;
-    video.muted  = v === 0;
-    muteBtn.textContent = v === 0 ? "🔇" : "🔊";
+    video.muted = v === 0;
+
+    muteBtn.textContent =
+      v === 0 ? "🔇" : "🔊";
   }
 </script>
 
