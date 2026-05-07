@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+/>
+
 <title>Video Interactivo</title>
 
 <style>
@@ -25,9 +29,11 @@ body{
 video{
   position:fixed;
   inset:0;
+
   width:100%;
   height:100vh;
   height:100dvh;
+
   object-fit:contain;
 }
 
@@ -337,7 +343,6 @@ button:active{
   color:white;
 }
 
-/* separación */
 #finalButton{
   margin-bottom:14px;
 }
@@ -356,7 +361,6 @@ button:active{
   border-color:rgba(255,255,255,0.22);
 }
 
-/* icono tiktok */
 #finalButton svg{
   width:38px;
   height:38px;
@@ -365,7 +369,6 @@ button:active{
     drop-shadow(0 2px 6px rgba(0,0,0,0.5));
 }
 
-/* icono reiniciar */
 #restartFlowButton{
   font-size:34px;
   font-weight:700;
@@ -394,11 +397,15 @@ button:active{
 
   padding:20px;
   gap:20px;
+
+  opacity:1;
 }
 
 #rotateOverlay .rotate-icon{
   font-size:clamp(48px,12vw,80px);
-  animation:rotateAnim 2s ease-in-out infinite;
+
+  animation:
+    rotateAnim 2s ease-in-out infinite;
 }
 
 #rotateOverlay p{
@@ -411,18 +418,13 @@ button:active{
 }
 
 @keyframes rotateAnim{
+
   0%,100%{
     transform:rotate(0deg);
   }
 
   50%{
     transform:rotate(90deg);
-  }
-}
-
-@media (hover:none) and (orientation:portrait){
-  #rotateOverlay{
-    display:flex;
   }
 }
 
@@ -466,16 +468,32 @@ button:active{
 
 <!-- ROTATE -->
 <div id="rotateOverlay">
-  <div class="rotate-icon">📱</div>
-  <p>Por favor, gira tu dispositivo para una mejor experiencia</p>
+
+  <div class="rotate-icon">
+    📱
+  </div>
+
+  <p>
+    Por favor, gira tu dispositivo
+    para una mejor experiencia
+  </p>
+
 </div>
 
 <!-- VIDEO -->
-<video id="video" muted playsinline></video>
+<video
+  id="video"
+  muted
+  playsinline
+></video>
 
 <!-- START -->
 <div id="startScreen">
-  <button onclick="start()">Iniciar</button>
+
+  <button onclick="start()">
+    Iniciar
+  </button>
+
 </div>
 
 <!-- OVERLAY -->
@@ -528,11 +546,20 @@ button:active{
 <!-- CONTROLES -->
 <div id="controls">
 
-  <button onclick="restartVideo()">⏮</button>
+  <button onclick="restartVideo()">
+    ⏮
+  </button>
 
-  <button onclick="togglePlay()">⏯</button>
+  <button onclick="togglePlay()">
+    ⏯
+  </button>
 
-  <button id="skipBtn" onclick="skip()">⏭</button>
+  <button
+    id="skipBtn"
+    onclick="skip()"
+  >
+    ⏭
+  </button>
 
 </div>
 
@@ -551,7 +578,10 @@ button:active{
       oninput="setVolume(this.value)"
     >
 
-    <button id="muteBtn" onclick="toggleMute()">
+    <button
+      id="muteBtn"
+      onclick="toggleMute()"
+    >
       🔊
     </button>
 
@@ -561,7 +591,8 @@ button:active{
 
 <script>
 
-const video = document.getElementById("video");
+const video =
+  document.getElementById("video");
 
 const options =
   document.getElementById("options");
@@ -598,19 +629,49 @@ let skipping = false;
    ORIENTATION
 ========================= */
 
+let rotateTimeout = null;
+
 function checkOrientation(){
 
   const portrait =
-    window.innerHeight > window.innerWidth;
+    window.innerHeight >
+    window.innerWidth;
 
   const touch =
     "ontouchstart" in window ||
     navigator.maxTouchPoints > 0;
 
-  rotateOverlay.style.display =
-    (portrait && touch)
-    ? "flex"
-    : "none";
+  if(portrait && touch){
+
+    rotateOverlay.style.display = "flex";
+    rotateOverlay.style.opacity = "1";
+
+    clearTimeout(rotateTimeout);
+
+    rotateTimeout = setTimeout(() => {
+
+      rotateOverlay.style.transition =
+        "opacity 0.8s ease";
+
+      rotateOverlay.style.opacity = "0";
+
+      setTimeout(() => {
+
+        rotateOverlay.style.display =
+          "none";
+
+      },800);
+
+    },3000);
+
+  }else{
+
+    clearTimeout(rotateTimeout);
+
+    rotateOverlay.style.opacity = "1";
+
+    rotateOverlay.style.display = "none";
+  }
 }
 
 window.addEventListener(
@@ -665,7 +726,7 @@ function loadVideo(src, intro = false){
 
     video.play().catch(() => {});
 
-  }, 100);
+  },100);
 }
 
 /* =========================
@@ -674,9 +735,9 @@ function loadVideo(src, intro = false){
 
 video.addEventListener("ended", () => {
 
-  if (skipping) return;
+  if(skipping) return;
 
-  if (isIntro){
+  if(isIntro){
 
     introCompleted = true;
 
@@ -690,7 +751,8 @@ video.addEventListener("ended", () => {
 
     finalButton.style.display = "flex";
 
-    restartFlowButton.style.display = "flex";
+    restartFlowButton.style.display =
+      "flex";
   }
 });
 
@@ -704,7 +766,8 @@ function playVideo(src){
 
   finalButton.style.display = "none";
 
-  restartFlowButton.style.display = "none";
+  restartFlowButton.style.display =
+    "none";
 
   skipBtn.style.display = "block";
 
@@ -720,8 +783,11 @@ function togglePlay(){
   if(!video.src) return;
 
   if(video.paused){
+
     video.play().catch(() => {});
+
   }else{
+
     video.pause();
   }
 }
@@ -738,7 +804,8 @@ function restartVideo(){
 
   finalButton.style.display = "none";
 
-  restartFlowButton.style.display = "none";
+  restartFlowButton.style.display =
+    "none";
 
   skipBtn.style.display = "block";
 
@@ -765,8 +832,11 @@ function skip(){
 
     video.pause();
 
-    if(video.duration && isFinite(video.duration)){
-      video.currentTime = video.duration;
+    if(video.duration &&
+       isFinite(video.duration)){
+
+      video.currentTime =
+        video.duration;
     }
 
     skipBtn.style.display = "none";
@@ -783,15 +853,19 @@ function skip(){
 
     video.pause();
 
-    if(video.duration && isFinite(video.duration)){
-      video.currentTime = video.duration;
+    if(video.duration &&
+       isFinite(video.duration)){
+
+      video.currentTime =
+        video.duration;
     }
 
     skipBtn.style.display = "none";
 
     finalButton.style.display = "flex";
 
-    restartFlowButton.style.display = "flex";
+    restartFlowButton.style.display =
+      "flex";
 
     setTimeout(() => {
       skipping = false;
@@ -809,7 +883,8 @@ function restartFlow(){
 
   finalButton.style.display = "none";
 
-  restartFlowButton.style.display = "none";
+  restartFlowButton.style.display =
+    "none";
 
   skipBtn.style.display = "block";
 
@@ -849,7 +924,8 @@ function toggleMute(){
     : "🔊";
 
   if(!video.muted){
-    volumeSlider.value = video.volume;
+    volumeSlider.value =
+      video.volume;
   }
 }
 
