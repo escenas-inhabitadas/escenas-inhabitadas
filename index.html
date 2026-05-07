@@ -24,7 +24,7 @@
     width: 100%;
     height: 100vh;
     height: 100dvh; /* viewport real en móviles (excluye barra del navegador) */
-    object-fit: cover;
+    object-fit: contain;
   }
 
   .overlay {
@@ -305,7 +305,7 @@
     video.muted  = false;
     video.volume = 1;
     volumeControl.style.display = "flex";
-    loadVideo("Rough_Intro(Todo).mp4", true);
+    loadVideo("Color_Intro_TODO.mp4", true);
   }
 
   function loadVideo(src, intro = false) {
@@ -415,7 +415,7 @@
 
     isIntro        = true;
     introCompleted = false;
-    loadVideo("Rough_Intro(Todo).mp4", true);
+    loadVideo("Color_Intro_TODO.mp4", true);
   }
 
   function goToLink() {
