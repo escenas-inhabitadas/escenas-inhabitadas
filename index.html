@@ -39,6 +39,40 @@ body{
   overflow:hidden;
 
   background:black;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* =========================
+   VIDEO FRAME
+========================= */
+
+#videoFrame{
+  width:min(90%,calc(93dvh * 16 / 9));
+  aspect-ratio:16/9;
+
+  background:white;
+  /* padding fino para los vídeos normales */
+  padding:clamp(10px,1.4vw,20px) clamp(18px,2.5vw,36px);
+
+  flex-shrink:0;
+  overflow:hidden;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Borde grueso para el intro */
+#videoFrame.is-intro{
+  padding:clamp(18px,2.5vw,40px) clamp(32px,4.45vw,72px);
+}
+
+/* Zoom intro para ocultar sus márgenes blancos de contenido */
+#videoFrame.is-intro video{
+  transform:scale(1.3);
 }
 
 /* =========================
@@ -46,16 +80,18 @@ body{
 ========================= */
 
 video{
-  position:fixed;
-  inset:0;
-
   width:100%;
-  height:100vh;
-  height:100dvh;
+  height:100%;
 
   object-fit:contain;
 
-  background:black;
+  background:white;
+
+  /* línea separadora para que el borde sea visible en contenido gris claro */
+  outline:1px solid rgba(0,0,0,0.12);
+  outline-offset:-1px;
+
+  transition:transform 0.3s ease;
 }
 
 /* =========================
@@ -82,13 +118,6 @@ video{
       rotate(90deg);
 
     transform-origin:center center;
-  }
-
-  video{
-    width:100%;
-    height:100%;
-
-    object-fit:contain;
   }
 }
 
@@ -260,8 +289,8 @@ button:active{
 #controls{
   position:fixed;
 
-  bottom:clamp(10px,2vh,20px);
-  left:clamp(10px,2vw,20px);
+  bottom:clamp(45px,6vh,75px);
+  left:clamp(100px,10vw,160px);
 
   z-index:3;
 
@@ -291,8 +320,8 @@ button:active{
 #volumeControl{
   position:fixed;
 
-  bottom:clamp(10px,2vh,20px);
-  right:max(env(safe-area-inset-right),10px);
+  bottom:clamp(45px,6vh,75px);
+  right:clamp(100px,10vw,160px);
 
   z-index:50;
 
@@ -362,22 +391,33 @@ button:active{
    BOTONES FINALES
 ========================= */
 
-#finalButton,
-#restartFlowButton{
-  position:relative;
+#finalButtonsContainer{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  pointer-events:all;
+}
 
-  width:76px;
-  height:76px;
+#finalButton,
+#restartFlowButton,
+#backToOptionsButton{
+  width:clamp(160px,22vw,220px);
+  height:clamp(44px,6vh,56px);
 
   padding:0;
 
-  border-radius:50%;
+  border-radius:40px;
 
-  display:none;
+  display:flex;
   justify-content:center;
   align-items:center;
 
-  pointer-events:all;
+  font-size:clamp(13px,1.8vw,15px);
+  font-weight:700;
+  letter-spacing:0.3px;
+
+  color:white;
 
   background:
     linear-gradient(
@@ -394,16 +434,11 @@ button:active{
   box-shadow:
     0 12px 32px rgba(0,0,0,0.55),
     inset 0 1px 0 rgba(255,255,255,0.04);
-
-  color:white;
-}
-
-#finalButton{
-  margin-bottom:14px;
 }
 
 #finalButton:hover,
-#restartFlowButton:hover{
+#restartFlowButton:hover,
+#backToOptionsButton:hover{
   transform:translateY(-4px) scale(1.06);
 
   background:
@@ -414,19 +449,6 @@ button:active{
     );
 
   border-color:rgba(255,255,255,0.22);
-}
-
-#finalButton svg{
-  width:38px;
-  height:38px;
-
-  filter:
-    drop-shadow(0 2px 6px rgba(0,0,0,0.5));
-}
-
-#restartFlowButton{
-  font-size:34px;
-  font-weight:700;
 }
 
 /* =========================
@@ -447,18 +469,11 @@ button:active{
   }
 
   #finalButton,
-  #restartFlowButton{
-    width:68px;
-    height:68px;
-  }
-
-  #finalButton svg{
-    width:34px;
-    height:34px;
-  }
-
-  #restartFlowButton{
-    font-size:30px;
+  #restartFlowButton,
+  #backToOptionsButton{
+    width:clamp(140px,40vw,180px);
+    height:clamp(40px,5vh,48px);
+    font-size:12px;
   }
 }
 
@@ -470,11 +485,13 @@ button:active{
 <div class="app">
 
   <!-- VIDEO -->
-  <video
-    id="video"
-    muted
-    playsinline
-  ></video>
+  <div id="videoFrame">
+    <video
+      id="video"
+      muted
+      playsinline
+    ></video>
+  </div>
 
   <!-- START -->
   <div id="startScreen">
@@ -505,30 +522,33 @@ button:active{
 
     </div>
 
-    <!-- TIKTOK -->
-    <button
-      id="finalButton"
-      onclick="goToLink()"
-      aria-label="TikTok"
-    >
+    <!-- BOTONES FINALES -->
+    <div id="finalButtonsContainer">
 
-      <svg
-        viewBox="0 0 24 24"
-        fill="currentColor"
+      <button
+        id="finalButton"
+        onclick="playCredits()"
+        aria-label="Créditos"
       >
-        <path d="M12.75 2h2.25c.2 1.9 1.7 3.4 3.6 3.6v2.3c-1.3-.1-2.5-.5-3.6-1.2v7.4c0 3.2-2.6 5.8-5.8 5.8s-5.8-2.6-5.8-5.8 2.6-5.8 5.8-5.8c.3 0 .6 0 .9.1v2.4c-.3-.1-.6-.2-.9-.2-1.9 0-3.4 1.5-3.4 3.4s1.5 3.4 3.4 3.4 3.4-1.5 3.4-3.4V2z"/>
-      </svg>
+        Créditos
+      </button>
 
-    </button>
+      <button
+        id="restartFlowButton"
+        onclick="restartFlow()"
+        aria-label="Volver al inicio"
+      >
+        Volver al inicio
+      </button>
 
-    <!-- RESTART -->
-    <button
-      id="restartFlowButton"
-      onclick="restartFlow()"
-      aria-label="Reiniciar"
-    >
-      ↻
-    </button>
+      <button
+        id="backToOptionsButton"
+        onclick="goToOptions()"
+      >
+        Volver a opciones
+      </button>
+
+    </div>
 
   </div>
 
@@ -588,11 +608,11 @@ const video =
 const options =
   document.getElementById("options");
 
-const finalButton =
-  document.getElementById("finalButton");
+const finalButtonsContainer =
+  document.getElementById("finalButtonsContainer");
 
-const restartFlowButton =
-  document.getElementById("restartFlowButton");
+const videoFrame =
+  document.getElementById("videoFrame");
 
 const startScreen =
   document.getElementById("startScreen");
@@ -641,6 +661,12 @@ function loadVideo(src, intro = false){
   isIntro = intro;
   introCompleted = false;
 
+  if(intro){
+    videoFrame.classList.add("is-intro");
+  }else{
+    videoFrame.classList.remove("is-intro");
+  }
+
   video.pause();
 
   video.src = src;
@@ -676,9 +702,7 @@ video.addEventListener("ended", () => {
 
     skipBtn.style.display = "none";
 
-    finalButton.style.display = "flex";
-
-    restartFlowButton.style.display =
+    finalButtonsContainer.style.display =
       "flex";
   }
 });
@@ -691,9 +715,7 @@ function playVideo(src){
 
   options.style.display = "none";
 
-  finalButton.style.display = "none";
-
-  restartFlowButton.style.display =
+  finalButtonsContainer.style.display =
     "none";
 
   skipBtn.style.display = "block";
@@ -729,9 +751,7 @@ function restartVideo(){
 
   options.style.display = "none";
 
-  finalButton.style.display = "none";
-
-  restartFlowButton.style.display =
+  finalButtonsContainer.style.display =
     "none";
 
   skipBtn.style.display = "block";
@@ -789,9 +809,7 @@ function skip(){
 
     skipBtn.style.display = "none";
 
-    finalButton.style.display = "flex";
-
-    restartFlowButton.style.display =
+    finalButtonsContainer.style.display =
       "flex";
 
     setTimeout(() => {
@@ -808,9 +826,7 @@ function restartFlow(){
 
   options.style.display = "none";
 
-  finalButton.style.display = "none";
-
-  restartFlowButton.style.display =
+  finalButtonsContainer.style.display =
     "none";
 
   skipBtn.style.display = "block";
@@ -826,15 +842,27 @@ function restartFlow(){
 }
 
 /* =========================
-   LINK
+   CRÉDITOS
 ========================= */
 
-function goToLink(){
+function playCredits(){
+  playVideo("Rough_OFicinaCentral.mp4");
+}
 
-  window.open(
-    "https://www.tiktok.com/@escenas_inhabitadas?_r=1&_t=ZS-95hnxZTzgVZ",
-    "_blank"
-  );
+/* =========================
+   VOLVER A OPCIONES
+========================= */
+
+function goToOptions(){
+
+  finalButtonsContainer.style.display =
+    "none";
+
+  skipBtn.style.display = "none";
+
+  video.pause();
+
+  options.style.display = "flex";
 }
 
 /* =========================
