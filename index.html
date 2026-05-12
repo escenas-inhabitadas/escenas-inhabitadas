@@ -683,6 +683,17 @@ function loadVideo(src, intro = false){
 }
 
 /* =========================
+   TIMEUPDATE — opciones a los 51 s del intro
+========================= */
+
+video.addEventListener("timeupdate", () => {
+  if(isIntro && video.currentTime >= 51 &&
+     options.style.display !== "flex"){
+    options.style.display = "flex";
+  }
+});
+
+/* =========================
    VIDEO END
 ========================= */
 
