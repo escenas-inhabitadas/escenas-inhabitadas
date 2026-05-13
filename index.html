@@ -50,6 +50,8 @@ body{
 ========================= */
 
 #videoFrame{
+  position:relative;
+
   width:min(90%,calc(93dvh * 16 / 9));
   aspect-ratio:16/9;
 
@@ -260,10 +262,11 @@ button:active{
 ========================= */
 
 #startScreen{
-  position:fixed;
+  position:absolute;
   inset:0;
 
-  background:rgba(0,0,0,0.75);
+  background:
+    url("logo-portada.png") center/cover no-repeat;
 
   display:flex;
   justify-content:center;
@@ -491,14 +494,15 @@ button:active{
       muted
       playsinline
     ></video>
-  </div>
 
-  <!-- START -->
-  <div id="startScreen">
+    <!-- START -->
+    <div id="startScreen">
 
-    <button onclick="start()">
-      Iniciar
-    </button>
+      <button onclick="start()">
+        Iniciar
+      </button>
+
+    </div>
 
   </div>
 
